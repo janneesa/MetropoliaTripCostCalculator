@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS_ID = 'docker-hub-credentials'
-        DOCKERHUB_REPO = 'jannesa/metropoliatripcostcalculator'
+        DOCKERHUB_REPO = 'janneesa/metropoliatripcostcalculator'
         DOCKER_IMAGE_TAG = 'latest'
     }
 
