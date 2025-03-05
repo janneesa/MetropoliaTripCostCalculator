@@ -1,43 +1,59 @@
 pipeline {
     agent any
+
+    environment {
+        DOCKERHUB_CREDENTIALS_ID = 'docker-hub-credentials'
+        DOCKERHUB_REPO = 'jannesa/metropoliatripcostcalculator'
+        DOCKER_IMAGE_TAG = 'latest'
+    }
+
     stages {
         stage('Checkout') {
             steps {
                 git branch: "main", url: 'https://github.com/janneesa/MetropoliaTripCostCalculator.git'
             }
         }
-        stage('Build') {
+        stage('Run Tests') {
             steps {
-                bat 'mvn clean package'
+                // Run the tests first to generate data for Jacoco and JUnit
+                bat 'mvn clean test' // For Windows agents
+                // sh 'mvn clean test' // Uncomment if on a Linux agent
             }
         }
-        stage('Test') {
+        stage('Code Coverage') {
             steps {
-                bat 'mvn test'
+                // Generate Jacoco report after the tests have run
+                bat 'mvn jacoco:report'
+            }
+        }
+        stage('Publish Test Results') {
+            steps {
+                // Publish JUnit test results
+                junit '**/target/surefire-reports/*.xml'
+            }
+        }
+        stage('Publish Coverage Report') {
+            steps {
+                // Publish Jacoco coverage report
+                jacoco()
             }
         }
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("local-image:tagname")
+                    docker.build("${env.DOCKERHUB_REPO}:${env.DOCKER_IMAGE_TAG}")
                 }
             }
         }
-        stage('Tag Docker Image') {
+        stage('Push Docker Image to Docker Hub') {
             steps {
                 script {
-                    bat 'docker tag local-image:tagname janneesa/metropoliatripcostcalculator:tagname'
-                }
-            }
-        }
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
-                        bat 'docker push janneesa/metropoliatripcostcalculator:tagname'
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS_ID) {
+                        docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}").push()
                     }
                 }
             }
         }
     }
 }
+
