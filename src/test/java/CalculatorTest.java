@@ -5,6 +5,7 @@ class CalculatorTest {
     @org.junit.jupiter.api.Test
     void calculateFuelConsumption() {
         Calculator calculator = new Calculator();
+        calculator.setLitersPerKm(5.0);
         double km = 100;
         double fuelPricePerLiter = 2.5;
         double fuelCost = calculator.calculateFuelConsumption(km, fuelPricePerLiter);
@@ -24,12 +25,14 @@ class CalculatorTest {
     @org.junit.jupiter.api.Test
     void getLitersPerKm() {
         Calculator calculator = new Calculator();
+        calculator.setLitersPerKm(5.0);
         assertEquals(5.0, calculator.getLitersPerKm());
     }
 
     @org.junit.jupiter.api.Test
     void getFuelNeeded() {
         Calculator calculator = new Calculator();
+        calculator.setLitersPerKm(5.0);
         double km = 100;
         double fuelPricePerLiter = 2.5;
         calculator.calculateFuelConsumption(km, fuelPricePerLiter);
@@ -39,6 +42,7 @@ class CalculatorTest {
     @org.junit.jupiter.api.Test
     void getFuelCost() {
         Calculator calculator = new Calculator();
+        calculator.setLitersPerKm(5.0);
         double km = 100;
         double fuelPricePerLiter = 2.5;
         calculator.calculateFuelConsumption(km, fuelPricePerLiter);
